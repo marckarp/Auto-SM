@@ -9,6 +9,7 @@ from sagemaker.estimator import Estimator
 import time
 from time import gmtime, strftime
 import subprocess
+import shlex
 
 
 #Setup
@@ -19,13 +20,16 @@ s3 = boto_session.resource('s3')
 region = boto_session.region_name
 print(region)
 sagemaker_session = sagemaker.Session()
-role = "arn:aws:iam::474422712127:role/sagemaker-role-BYOC"
+role = "arn:aws:iam::474422712127:role/sagemaker-role-BYOC" #add functionality to add role
 
 #Build tar file with model data + inference code
-#ToDo: Edit this
-#bashCommand = "tar -cvpzf model.tar.gz 0000001 inference.py"
-#process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-#output, error = process.communicate()
+createDirectory = "mkdir code"
+copyInference = "cp inference.py code"
+p1 = subprocess.call(createDirectory, shell=True)
+p2 = subprocess.call(copyInference, shell=True)
+createZip = "tar -cvpzf model.tar.gz ./0000001 ./code"
+p3 = subprocess.Popen(createZip.split(), stdout=subprocess.PIPE)
+output, error = p3.communicate()
 
 
 # retrieve tf image
@@ -74,7 +78,7 @@ endpoint_config_response = client.create_endpoint_config(
         {
             "VariantName": "tfvariant",
             "ModelName": model_name,
-            "InstanceType": "ml.c5.large",
+            "InstanceType": "ml.c5.xlarge",
             "InitialInstanceCount": 1
         },
     ],

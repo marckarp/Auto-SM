@@ -15,7 +15,7 @@ print(sampInput)
 
 
 runtime_sm_client = boto3.client(service_name='sagemaker-runtime')
-endpoint_name = "tf-ep2022-01-11-22-08-39"
+endpoint_name = "tf-ep2022-01-12-03-58-54"
 jsons = JSONSerializer()
 payload = jsons.serialize(sampInput)
 response = runtime_sm_client.invoke_endpoint(
