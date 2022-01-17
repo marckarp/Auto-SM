@@ -1,47 +1,43 @@
+import joblib
+import os
 import json
 
-def input_handler(data, context):
-    """ Pre-process request input before it is sent to TensorFlow Serving REST API
-    Args:
-        data (obj): the request data, in format of dict or string
-        context (Context): an object containing request and configuration details
-    Returns:
-        (dict): a JSON-serializable dict that contains request body and headers
-    """
-    if context.request_content_type == 'application/json':
-        # pass through json (assumes it's correctly formed)
-        d = data.read().decode('utf-8')
-        print("------------")
-        print(d)
-        print(type(d))
-        print("------------")
-        return d if len(d) else ''
+"""
+Deserialize fitted model
+"""
+def model_fn(model_dir):
+    model = joblib.load(os.path.join(model_dir, "model.joblib"))
+    return model
 
-    if context.request_content_type == 'text/csv':
-        # very simple csv handler
-        return json.dumps({
-            'instances': [float(x) for x in data.read().decode('utf-8').split(',')]
-        })
+"""
+input_fn
+    request_body: The body of the request sent to the model.
+    request_content_type: (string) specifies the format/variable type of the request
+"""
+def input_fn(request_body, request_content_type):
+    if request_content_type == 'application/json':
+        request_body = json.loads(request_body)
+        inpVar = request_body['Input']
+        return inpVar
+    else:
+        raise ValueError("This model only supports application/json input")
 
-    raise ValueError('{{"error": "unsupported content type {}"}}'.format(
-        context.request_content_type or "unknown"))
+"""
+predict_fn
+    input_data: returned array from input_fn above
+    model (sklearn model) returned model loaded from model_fn above
+"""
+def predict_fn(input_data, model):
+    return model.predict(input_data)
 
+"""
+output_fn
+    prediction: the returned value from predict_fn above
+    content_type: the content type the endpoint expects to be returned. Ex: JSON, string
 
-def output_handler(data, context):
-    """Post-process TensorFlow Serving output before it is returned to the client.
-    Args:
-        data (obj): the TensorFlow serving response
-        context (Context): an object containing request and configuration details
-    Returns:
-        (bytes, string): data to return to client, response content type
-    """
-    if data.status_code != 200:
-        raise ValueError(data.content.decode('utf-8'))
+"""
 
-    response_content_type = context.accept_header
-    print("-------")
-    print(data)
-    print(type(data))
-    print("-----")
-    prediction = data.content
-    return prediction, response_content_type
+def output_fn(prediction, content_type):
+    res = int(prediction[0])
+    respJSON = {'Output': res}
+    return respJSON

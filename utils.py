@@ -46,6 +46,11 @@ def check_model_package():
 Build a function to automate zip file creation, take out redundance of next function
 """
 
+def build_zip_file(zip_file):
+    p3 = subprocess.Popen(zip_file.split(), stdout=subprocess.PIPE)
+    output, error = p3.communicate()
+
+
 def custom_inference_package(framework_type, model_data, inference_script):
     #works for tensorflow right now not sklearn/pytorch
     print("In custom inference package")
@@ -56,27 +61,24 @@ def custom_inference_package(framework_type, model_data, inference_script):
         copyInference = f"cp {inference_script} code"
         p1 = subprocess.call(createDirectory, shell=True)
         p2 = subprocess.call(copyInference, shell=True)
-        createZip = f"tar -cvpzf model.tar.gz ./{model_data} ./code"
-        p3 = subprocess.Popen(createZip.split(), stdout=subprocess.PIPE)
-        output, error = p3.communicate()
+        zip_file = f"tar -cvpzf model.tar.gz ./{model_data} ./code"
+        build_zip_file(zip_file)
+
     elif framework_type == "sklearn":
         print("Building a custom sklearn package")
-        createZip = f"tar -cvpzf model.tar.gz {model_data} {inference_script}"
-        p3 = subprocess.Popen(createZip.split(), stdout=subprocess.PIPE)
-        output, error = p3.communicate()
+        zip_file = f"tar -cvpzf model.tar.gz {model_data} {inference_script}"
+        build_zip_file(zip_file)
 
 
 def inference_package(framework_type, model_data):
     print("In inference package function")
     if framework_type == "tensorflow":
-        createZip = f"tar -cvpzf model.tar.gz ./{model_data}"
-        p3 = subprocess.Popen(createZip.split(), stdout=subprocess.PIPE)
-        output, error = p3.communicate()
+        zip_file = f"tar -cvpzf model.tar.gz ./{model_data}"
+        build_zip_file(zip_file)
     elif framework_type == "sklearn":
         print("building sklearn pakcage without inference script")
-        createZip = f"tar -cvpzf model.tar.gz {model_data}"
-        p3 = subprocess.Popen(createZip.split(), stdout=subprocess.PIPE)
-        output, error = p3.communicate()
+        zip_file = f"tar -cvpzf model.tar.gz {model_data}"
+        build_zip_file(zip_file)
 
 
 def build_model_package(framework_type, model_data, inference_script=None):
@@ -102,9 +104,16 @@ def build_model_package(framework_type, model_data, inference_script=None):
 
 
 def create_model(image_uri, model_data):
-    #Step 1: Model Creation
+    """Builds a SageMaker Model Entity, which will be used to create an Endpoint Configuration.
+
+    Args:
+        image_uri (str): The image that has been retrieved for your specific framework.
+        model_data (str): The S3 URI of the model data.
+
+    Returns:
+        tuple: Contains SageMaker model name as first item and model arn as second item.
+    """
     model_name = "tf-autosm" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
-    #print("Model name: " + model_name)
     create_model_response = client.create_model(
         ModelName=model_name,
         Containers=[
@@ -124,6 +133,14 @@ def create_model(image_uri, model_data):
 
 #have to adjust to paramterize instance type later
 def create_epc(model_name):
+    """Creates SageMaker Endpoint Configuration.
+
+    Args:
+        model_name (str): SageMaker Model that was created in create_model function.
+
+    Returns:
+        tuple: Contains SageMaker Endpoint Configuration name as first item and Endpoint Configuration arn as second item.
+    """
     epc_name = "tf-epc-autosm" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
     endpoint_config_response = client.create_endpoint_config(
         EndpointConfigName=epc_name,
@@ -141,6 +158,14 @@ def create_epc(model_name):
 
 
 def monitor_ep(ep_name):
+    """Monitors endpoint creation, the process should take 3-6 minutes.
+
+    Args:
+        ep_name (str): Endpoint that is being created.
+
+    Returns:
+        str: Returns endpoint status "creating" till it is "InService".
+    """
     describe_endpoint_response = client.describe_endpoint(EndpointName=ep_name)
     while describe_endpoint_response["EndpointStatus"] == "Creating":
         describe_endpoint_response = client.describe_endpoint(EndpointName=ep_name)
@@ -149,6 +174,14 @@ def monitor_ep(ep_name):
     return describe_endpoint_response
 
 def create_ep(epc_name):
+    """Creates endpoint, will use monitor_ep to monitor endpoint creation.
+
+    Args:
+        epc_name (str): Using endpoint configuration created by create_epc call.
+
+    Returns:
+        tuple: Contains SageMaker Endpoint name as first item and Endpoint arn as second item.
+    """
     ep_name = "tf-ep-autosm" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
     create_endpoint_response = client.create_endpoint(
         EndpointName=ep_name,
@@ -158,23 +191,18 @@ def create_ep(epc_name):
     print(monitor_ep(ep_name))
     return ep_name, ep_arn
 
+
 def check_model_artifact(framework_type, model_data):
     if framework_type == "sklearn":
         if "joblib" not in model_data:
-            raise ValueError("For the sklearn framework your model data must be saved using the joblib module. \n"
-            "Check out the following link for an example of using the joblib package: https://scikit-learn.org/0.18/modules/model_persistence.html")
+            return False
+        return True
 
-
-"""
-if __name__ == '__main__':
-    tf_image = retrieve_image("sklearn","ml.m5.xlarge","0.23-1")
-    model_data = build_model_package('sklearn', 'model.joblib', "inference.py")
-    model = create_model(tf_image, model_data)
-    model_name, model_arn = model[0], model[1]
-    epc = create_epc(model_name)
-    epc_name, epc_arn = epc[0], epc[1]
-    ep_status = create_ep(epc_name)
-    ep_name, ep_arn = ep_status[0], ep_status[1]
-    print("Endpoint name: " + ep_name)
-    print("Endpoint arn: " + ep_arn)
-"""
+    elif framework_type == "tensorflow":
+        tf_files = ['assets', 'variables', 'keras_metadata.pb', 'saved_model.pb']
+        if os.path.isdir(model_data):
+            files = os.listdir(model_data)
+            if all(elem in files for elem in tf_files):
+                return True
+            return False
+        return False

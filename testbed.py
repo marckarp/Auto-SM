@@ -144,60 +144,17 @@ import os
 def check_model_artifact(framework_type, model_data):
     if framework_type == "sklearn":
         if "joblib" not in model_data:
-            raise ValueError("For the sklearn framework your model data must be saved using the joblib module. \n"
-            "Check out the following link for an example of using the joblib package: https://scikit-learn.org/0.18/modules/model_persistence.html")
+            return False
+        return True
+
+    elif framework_type == "tensorflow":
+        tf_files = ['assets', 'variables', 'keras_metadata.pb', 'saved_model.pb']
+        if os.path.isdir(model_data):
+            files = os.listdir(model_data)
+            if all(elem in files for elem in tf_files):
+                return True
+            return False
+        return False
 
 
-if os.path.exists("sadasa") is False:
-    raise ValueError("Cannot find your inference script, please enter the proper path to your code.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-def custom_inference_package(model_data, inference_script):
-    #works for tensorflow right now not sklearn/pytorch
-    createDirectory = "mkdir code"
-    copyInference = f"cp {inference_script} code"
-    p1 = subprocess.call(createDirectory, shell=True)
-    p2 = subprocess.call(copyInference, shell=True)
-    createZip = f"tar -cvpzf model.tar.gz ./{model_data} ./code"
-    p3 = subprocess.Popen(createZip.split(), stdout=subprocess.PIPE)
-    output, error = p3.communicate()
-
-def inference_package(model_data):
-    createZip = f"tar -cvpzf model.tar.gz ./{model_data}"
-    p3 = subprocess.Popen(createZip.split(), stdout=subprocess.PIPE)
-    output, error = p3.communicate()
-
-
-
-def build_model_package(model_data, inference_script=None):
-    Need to edit and add functionality to take in sklearn/pytorch, adjust bash commands in custom_inference_package
-    and inference_package modules to deploy endpoint properly
-    if model_data is None:
-        raise ValueError("You need to provide the file path for the directory with your model data.")
-    if inference_script is not None:
-        custom_inference_package(model_data, inference_script)
-    else:
-        inference_package(model_data)
-    if check_model_package:
-        default_bucket = sagemaker_session.default_bucket()
-        model_artifacts = f"s3://{default_bucket}/model.tar.gz"
-        response = s3.meta.client.upload_file('model.tar.gz', default_bucket, 'model.tar.gz')
-    return model_artifacts
-"""
+print(check_model_artifact("tensorflow", "0000001"))

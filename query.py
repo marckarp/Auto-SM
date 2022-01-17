@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 from platform import python_version
 import boto3
 import json
@@ -15,7 +16,7 @@ import logging
 
 from config import framework_types, tf_versions, pytorch_versions, sklearn_versions
 from utils import (retrieve_image, check_model_package, custom_inference_package, inference_package, 
-build_model_package, create_model, create_epc, monitor_ep, create_ep, check_model_artifact)
+build_model_package, create_model, create_epc, monitor_ep, create_ep, check_model_artifact, build_zip_file)
 
 class autoSM:
 
@@ -38,9 +39,9 @@ class autoSM:
         self.model_arn = None
         self.epc_name = None
         self.epc_arn = None
-        self.ep = None
+        self.ep_name = None
         self.ep_arn = None
-        self.ep_logs = None
+        #self.ep_logs = None
 
         if self.model_data is None:
             raise ValueError("Please make sure to enter the path for your model data/artifacts.")
@@ -61,13 +62,15 @@ class autoSM:
             if self.framework_version not in sklearn_versions:
                 raise ValueError(f"Unsupported sklearn version. You may need to upgrade your SDK version (pip install -U sagemaker) for newer sklearn versions.\n"
                 f"Supported sklearn versions: {sklearn_versions}")
-            #move this for all frameworks once function completed
-            #check_artifact(self.framework_type, self.model_data)
-        
+            if check_model_artifact("sklearn", self.model_data) is False:
+                raise ValueError("Make sure that your saved model is in joblib format.")
+
         elif self.framework_type == "tensorflow":
             if self.framework_version not in tf_versions:
                 raise ValueError(f"Unsupported tf version. You may need to upgrade your SDK version (pip install -U sagemaker) for newer Tensorflow versions.\n"
                 f"Supported TensorFlow versions: {tf_versions}")
+            if check_model_artifact("tensorflow", self.model_data) is False:
+                raise ValueError("Make sure you saved your TensorFlow model in the following format.")
                 
         elif self.framework_type == "pytorch":
             if self.framework_version not in pytorch_versions:
@@ -99,20 +102,19 @@ class autoSM:
         print(f"Model Data Directory: {self.model_data}")
         print(f"Instance Type: {self.instance_type}")
         print(f"Framework Version: {self.framework_version}")
+        print(f"Endpoint Name: {self.ep_name}")
+        print(f"Endpoint Arn: {self.ep_arn}")
 
 if __name__ == '__main__':
 
 
     #TF Example w/ custom inference script
-    auto_model = autoSM("tensorflow", '0000001', "ml.c5.xlarge", "2.3.0", "inference.py")
-    auto_model.deploy()
-    auto_model.describe_job()
-
-    #Sklearn Example w/ custom inference script
-    #auto_model = autoSM(framework_type="sklearn", model_data= "model.joblib", 
-    #instance_type = "ml.c5.xlarge", framework_version="0.23-1", inference_script="inference.py")
+    #auto_model = autoSM("tensorflow", '0000001', "ml.c5.xlarge", "2.3.0", "inference.py")
     #auto_model.deploy()
     #auto_model.describe_job()
 
-
-    #PyTorch Example: ToDo
+    #Sklearn Example w/ custom inference script
+    auto_model = autoSM(framework_type="sklearn", model_data= "model.joblib", 
+    instance_type = "ml.c5.xlarge", framework_version="0.23-1", inference_script="inference.py")
+    auto_model.deploy()
+    auto_model.describe_job()
