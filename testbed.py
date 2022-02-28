@@ -139,6 +139,7 @@ def build_model_package(image_uri, inference_script=None):
     return model_artifacts
 """
 
+"""
 import os
 
 def check_model_artifact(framework_type, model_data):
@@ -158,3 +159,31 @@ def check_model_artifact(framework_type, model_data):
 
 
 print(check_model_artifact("tensorflow", "0000001"))
+"""
+
+
+#import boto3
+
+#iam = boto3.client('iam')
+#iam_resource = boto3.resource('iam')
+#sts = boto3.client('sts')
+
+"""
+policies = iam_resource.policies.all()
+print('All account policies')
+for policy in policies:
+    print(f'  - {policy.policy_name}')
+"""
+
+
+
+import boto3
+ROLE_NAME = 'mars-roles'
+resource = boto3.resource('iam')
+role = resource.Role(ROLE_NAME)
+role.attach_policy(
+    PolicyArn='arn:aws:iam::aws:policy/AmazonS3FullAccess'
+)
+print('Policy has been attached to the IAM role')
+
+

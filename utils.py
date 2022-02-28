@@ -21,6 +21,7 @@ sagemaker_session = sagemaker.Session()
 role = "arn:aws:iam::474422712127:role/sagemaker-role-BYOC" #add functionality to add role
 
 
+#need to add functionality to automate region + role
 def retrieve_image(framework_type, instance_type, framework_version):
     image_uri = sagemaker.image_uris.retrieve(
         framework = framework_type,
