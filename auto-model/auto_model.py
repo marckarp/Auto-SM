@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sagemaker
 from time import gmtime, strftime
 from sm_client import AutoSMClient
 
