@@ -18,6 +18,10 @@ class AutoModel():
         self._inference_ = kwargs.get('inference', None)
         if not (self._requirements_ is None):
             assert os.path.isfile(self._requirements_), "Requirements must point to a valid file"
+
+        if not (self._inference_ is None):
+            assert self._inference_.split('/')[-1] == 'inference.py', "Inference script must be named inference.py"
+    
         self._auto_sm_client_ = AutoSMClient(role = role)
         self._sm_client_ = self._auto_sm_client_.AutoSagemakerClient
         self._role_ = self._auto_sm_client_.Role
