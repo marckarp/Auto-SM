@@ -1,6 +1,4 @@
-from auto_model import AutoModel
-
-print("AutoModel: ", AutoModel)
+from .auto_model import AutoModel
 
 class VertexModel(AutoModel):
     """ """

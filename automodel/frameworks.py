@@ -1,5 +1,5 @@
 from json.tool import main
-from auto_model import AutoModel
+from .auto_model import AutoModel
 
 class SKLearnModel(AutoModel):
     """ """
@@ -15,6 +15,9 @@ class SKLearnModel(AutoModel):
 class PyTorchModel(AutoModel):
     """ """
     def __init__(self, **kwargs) -> None:
+        kwargs['framework'] = 'pytorch'
+        assert 'version' in kwargs, "Framework version must be specified."
+        assert 'role' in kwargs, "Role must be provided"
         super().__init__(**kwargs)
 
     def package(self):
@@ -23,6 +26,9 @@ class PyTorchModel(AutoModel):
 class TensorflowModel(AutoModel):
     """ """
     def __init__(self, **kwargs) -> None:
+        kwargs['framework'] = 'tensorflow'
+        assert 'version' in kwargs, "Framework version must be specified."
+        assert 'role' in kwargs, "Role must be provided"
         super().__init__(**kwargs)
 
     def package(self):

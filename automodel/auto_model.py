@@ -2,7 +2,7 @@ import os
 import subprocess
 import sagemaker
 from time import gmtime, strftime
-from sm_client import AutoSMClient
+from .sm_client import AutoSMClient
 
 class AutoModel():
     """ """
@@ -11,6 +11,10 @@ class AutoModel():
         role = kwargs['role']
         self._framework_ = kwargs['framework']
         self._version_ = kwargs['version']
+        self._auto_sm_client_ = kwargs['AutoSMClient']
+
+        assert isinstance(self._auto_sm_client_, AutoSMClient), "An AutoSMClient must be provided"
+
         self._instance_type_ = kwargs.get('instance_type', 'ml.m5.xlarge')
         self._instance_count_ = kwargs.get('instance_count', 1)
         self._model_file_ = kwargs.get('model_file', None)
@@ -22,7 +26,6 @@ class AutoModel():
         if not (self._inference_ is None):
             assert self._inference_.split('/')[-1] == 'inference.py', "Inference script must be named inference.py"
     
-        self._auto_sm_client_ = AutoSMClient(role = role)
         self._sm_client_ = self._auto_sm_client_.AutoSagemakerClient
         self._role_ = self._auto_sm_client_.Role
 
