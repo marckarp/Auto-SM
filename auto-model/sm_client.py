@@ -41,7 +41,4 @@ class AutoSMClient():
 
 if __name__ == '__main__':
     ''' '''
-    auto_sm_client = AutoSMClient(role = 'arn:aws:iam::682101512330:role/service-role/AmazonSageMaker-ExecutionRole-20210412T095523')
-    sm_client = auto_sm_client.AutoSagemakerClient
-    s3_client = auto_sm_client.AutoS3Client
-    
+    pass
