@@ -33,11 +33,23 @@ class AutoModel():
 
     def package(self):
         ''' '''
+
+        ##added logic for packaging tensorflow because it is a little different
         filename = 'model.tar.gz'
         if self._inference_ is None:
-            bashCommand = f"tar -cvpzf {filename} {self._model_file_}"
+            if self._framework_ == "tensorflow":
+                bashCommand = f"tar -cvpzf model.tar.gz ./{self._model_file_}"
+            else:
+                bashCommand = f"tar -cvpzf {filename} {self._model_file_}"
         else:
-            bashCommand = f"tar -cvpzf {filename} {self._model_file_} {self._inference_}"
+            if self._framework_ == "tensorflow":
+                createDirectory = "mkdir code"
+                copyInference = f"cp {self._inference_} code"
+                p1 = subprocess.call(createDirectory, shell=True)
+                p2 = subprocess.call(copyInference, shell=True)
+                bashCommand = f"tar -cvpzf model.tar.gz ./{self._model_file_} ./code"
+            else:
+                bashCommand = f"tar -cvpzf {filename} {self._model_file_} {self._inference_}"
 
         process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()

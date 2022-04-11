@@ -1,5 +1,6 @@
 from json.tool import main
 from .auto_model import AutoModel
+from framework_check import check_model_artifact
 
 class SKLearnModel(AutoModel):
     """ """
@@ -11,6 +12,17 @@ class SKLearnModel(AutoModel):
 
     def package(self):
         return super().package()
+    
+    def check_artifact(self):
+        
+        ## Before packaging
+        #check that model data is proper artifact (joblib, etc)
+        #if proper artifact check for inference script
+        #then create inference package
+        filename = 'model.tar.gz'
+        if check_model_artifact("sklearn", self._model_file_):
+            self.package()
+        raise ValueError("Sklearn model artifact must be of type model.joblib for SageMaker.")
     
 class PyTorchModel(AutoModel):
     """ """
