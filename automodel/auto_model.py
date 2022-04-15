@@ -8,12 +8,13 @@ class AutoModel():
     """ """
     def __init__(self, **kwargs) -> None:
         ''' '''
-        role = kwargs['role']
+        # role = kwargs['role']
         self._framework_ = kwargs['framework']
         self._version_ = kwargs['version']
-        self._auto_sm_client_ = kwargs['AutoSMClient']
+        # self._auto_sm_client_ = kwargs['AutoSMClient']
+        self._auto_sm_client_ = AutoSMClient(**kwargs)
 
-        assert isinstance(self._auto_sm_client_, AutoSMClient), "An AutoSMClient must be provided"
+        # assert isinstance(self._auto_sm_client_, AutoSMClient), "An AutoSMClient must be provided"
 
         self._instance_type_ = kwargs.get('instance_type', 'ml.m5.xlarge')
         self._instance_count_ = kwargs.get('instance_count', 1)
@@ -27,42 +28,18 @@ class AutoModel():
         if not (self._inference_ is None):
             assert self._inference_.split('/')[-1] == 'inference.py', "Inference script must be named inference.py"
     
-        if not (self._model_data_ in None):
+        if not (self._model_data_ is None):
             assert not (len(os.listdir(self._model_data_)) == 0), "Model data folder must not be empty."
 
         self._sm_client_ = self._auto_sm_client_.AutoSagemakerClient
         self._role_ = self._auto_sm_client_.Role
 
-        print("role: ", self._role_)
-
-    # def package(self):
-    #     ''' '''
-    #     ##added logic for packaging tensorflow because it is a little different
-    #     filename = 'model.tar.gz'
-    #     if self._inference_ is None:
-    #         if self._framework_ == "tensorflow":
-    #             bashCommand = f"tar -cvpzf model.tar.gz {self._model_data_}/*"
-    #         else:
-    #             bashCommand = f"tar -cvpzf {filename} {self._model_data_}/*"
-    #     else:
-    #         if self._framework_ == "tensorflow":
-    #             createDirectory = "mkdir code"
-    #             copyInference = f"cp {self._inference_} code"
-    #             p1 = subprocess.call(createDirectory, shell=True)
-    #             p2 = subprocess.call(copyInference, shell=True)
-    #             bashCommand = f"tar -cvpzf model.tar.gz ./{self._model_file_} ./code"
-    #         else:
-    #             bashCommand = f"tar -cvpzf {filename} {self._model_file_} {self._inference_}"
-
-    #     process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-    #     output, error = process.communicate()
-    #     return filename
-
     def package(self):
         ''' '''
         filename = 'model.tar.gz'
         try:
-            bashCommand = f"tar -cvpzf {filename} {self._model_data_}/*"
+            print(os.listdir(self._model_data_))
+            bashCommand = f"tar -cvzf {filename} -C {self._model_data_} ."
             process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
             output, error = process.communicate()
         except:

@@ -1,5 +1,7 @@
 import boto3
 import sagemaker
+import configparser
+import os
 
 class AutoSMClient():
     """ """
@@ -12,7 +14,14 @@ class AutoSMClient():
         self._sm_client_ = boto3.client("sagemaker")
         
         self._default_bucket_ = sagemaker_session.default_bucket()
-        self._role_ = kwargs['role']
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        if 'AWS' in config and 'Role' in config['AWS']:
+            self._role_ = config['AWS']['Role']
+        elif 'role' in kwargs:
+            self._role_ = kwargs['role']
+        else:
+            raise Exception("Role must be provided when creating client or through config file.")
 
     @property
     def AutoS3Client(self):
