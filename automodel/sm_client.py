@@ -3,6 +3,8 @@ import sagemaker
 import configparser
 import os
 
+base_path = os.environ['HOME']
+
 class AutoSMClient():
     """ """
     def __init__(self, **kwargs) -> None:
@@ -15,12 +17,13 @@ class AutoSMClient():
         
         self._default_bucket_ = sagemaker_session.default_bucket()
         config = configparser.ConfigParser()
-        config.read('config.ini')
+        config.read(f'{base_path}/config.ini')
         if 'AWS' in config and 'Role' in config['AWS']:
             self._role_ = config['AWS']['Role']
         elif 'role' in kwargs:
             self._role_ = kwargs['role']
         else:
+            print("No role in Config file.")
             raise Exception("Role must be provided when creating client or through config file.")
 
     @property
