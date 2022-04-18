@@ -8,20 +8,16 @@ class AutoModel():
     """ """
     def __init__(self, **kwargs) -> None:
         ''' '''
-        # role = kwargs['role']
         self._framework_ = kwargs['framework']
         self._version_ = kwargs['version']
-        # self._auto_sm_client_ = kwargs['AutoSMClient']
         self._auto_sm_client_ = AutoSMClient(**kwargs)
-
-        # assert isinstance(self._auto_sm_client_, AutoSMClient), "An AutoSMClient must be provided"
 
         self._instance_type_ = kwargs.get('instance_type', 'ml.m5.xlarge')
         self._instance_count_ = kwargs.get('instance_count', 1)
-        # self._model_file_ = kwargs.get('model_file', None)
         self._model_data_ = kwargs.get('model_data', None)
         self._requirements_ = kwargs.get('requirements', None)
         self._inference_ = kwargs.get('inference', None)
+        
         if not (self._requirements_ is None):
             assert os.path.isfile(self._requirements_), "Requirements must point to a valid file"
 
