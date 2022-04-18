@@ -1,23 +1,10 @@
 import os
-import configparser
-from json.tool import main
 from .auto_model import AutoModel
-
-# config = configparser.ConfigParser()
-# print("Getting role")
-# configuration = config.read('config.ini')
-# role = None
-# if 'AWS' in configuration:
-#     if 'Role' in configuration['AWS']:
-#         role = configuration['AWS']['Role']
 
 class SKLearnModel(AutoModel):
     """ """
     def __init__(self, **kwargs) -> None:
         kwargs['framework'] = 'sklearn'
-        # print("Role: ", role)
-        # if role == None:
-        #     assert 'role' in kwargs, "Role must be provided"
         assert 'version' in kwargs, "Framework version must be specified."
         assert 'model_data' in kwargs, "Folder with model data must be provided"
         super().__init__(**kwargs)
@@ -42,8 +29,6 @@ class PyTorchModel(AutoModel):
     """ """
     def __init__(self, **kwargs) -> None:
         kwargs['framework'] = 'pytorch'
-        # if role == None:
-        #     assert 'role' in kwargs, "Role must be provided"
         assert 'version' in kwargs, "Framework version must be specified."
         assert 'model_data' in kwargs, "Folder with model data must be provided"
         super().__init__(**kwargs)
@@ -68,8 +53,6 @@ class TensorflowModel(AutoModel):
     """ """
     def __init__(self, **kwargs) -> None:
         kwargs['framework'] = 'tensorflow'
-        # if role == None:
-        #     assert 'role' in kwargs, "Role must be provided"
         assert 'version' in kwargs, "Framework version must be specified."
         assert 'model_data' in kwargs, "Folder with model data must be provided"
         super().__init__(**kwargs)
