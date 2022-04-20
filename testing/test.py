@@ -7,4 +7,4 @@ if __name__ == "__main__":
     tf_model = fwk.TensorflowModel(version = "1.15.2", model_data = 'tensorflow/model')
     
     sk_model.deploy_to_sagemaker()
-    tf_model.deploy_to_sagemaker()
+    # tf_model.deploy_to_sagemaker()
