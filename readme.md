@@ -45,3 +45,12 @@ model/
         files_needed_by_inference.py
 ```
 
+#### SKLearn
+...
+
+#### PyTorch
+...
+
+#### Tensorflow
+...
+
