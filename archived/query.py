@@ -109,12 +109,12 @@ if __name__ == '__main__':
 
 
     #TF Example w/ custom inference script
-    #auto_model = autoSM("tensorflow", '0000001', "ml.c5.xlarge", "2.3.0", "inference.py")
-    #auto_model.deploy()
-    #auto_model.describe_job()
-
-    #Sklearn Example w/ custom inference script
-    auto_model = autoSM(framework_type="sklearn", model_data= "model.joblib", 
-    instance_type = "ml.c5.xlarge", framework_version="0.23-1", inference_script="inference.py")
+    auto_model = autoSM("tensorflow", '0000001', "ml.c5.xlarge", "2.3.0", "inference.py")
     auto_model.deploy()
     auto_model.describe_job()
+
+    #Sklearn Example w/ custom inference script
+    #auto_model = autoSM(framework_type="sklearn", model_data= "model.joblib", 
+    #instance_type = "ml.c5.xlarge", framework_version="0.23-1")
+    #auto_model.deploy()
+    #auto_model.describe_job()
