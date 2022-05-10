@@ -3,13 +3,17 @@ import subprocess
 import sagemaker
 from time import gmtime, strftime
 from .sm_client import AutoSMClient
+import boto3
+
 
 class AutoModel():
+
     """ """
     def __init__(self, **kwargs) -> None:
         ''' '''
         self._framework_ = kwargs['framework']
         self._version_ = kwargs['version']
+
         self._auto_sm_client_ = AutoSMClient(**kwargs)
 
         self._instance_type_ = kwargs.get('instance_type', 'ml.m5.xlarge')
@@ -25,19 +29,25 @@ class AutoModel():
             assert self._inference_.split('/')[-1] == 'inference.py', "Inference script must be named inference.py"
     
         if not (self._model_data_ is None):
-            assert not (len(os.listdir(self._model_data_)) == 0), "Model data folder must not be empty."
+            #need to add logic to distinguish sklearn, tf, pytorch here
+            #sklearn is just a file and script, tf is a folder
+            assert not (len(self._model_data_) == 0), "Make sure to provide a model file"
 
         self._sm_client_ = self._auto_sm_client_.AutoSagemakerClient
         self._role_ = self._auto_sm_client_.Role
+
 
     def package(self):
         ''' '''
         filename = 'model.tar.gz'
         try:
-            print(os.listdir(self._model_data_))
-            bashCommand = f"tar -cvzf {filename} -C {self._model_data_} ."
-            process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-            output, error = process.communicate()
+            #print(os.listdir(self._model_data_))
+            print("-----In packaging function-----------")
+            print(self._model_data_)
+            print(self._inference_)
+            zip_file = f"tar -cvpzf model.tar.gz {self._model_data_} {self._inference_}"
+            p3 = subprocess.Popen(zip_file.split(), stdout=subprocess.PIPE)
+            output, error = p3.communicate()
         except:
             print("Unable to package model folder into tarball")
         return filename
@@ -46,6 +56,7 @@ class AutoModel():
         ''' '''
         s3_client = self._auto_sm_client_.AutoS3Client
         default_bucket = self._auto_sm_client_.DefaultBucket
+        #default_bucket = sagemaker_session.default_bucket()
         model_artifacts = f"s3://{default_bucket}/model.tar.gz"
         response = s3_client.upload_file(filename, default_bucket, 'model.tar.gz')
         return model_artifacts
@@ -58,6 +69,7 @@ class AutoModel():
             version         = self._version_,
             py_version      = "py3",
             instance_type   = self._instance_type_,
+            image_scope = "inference"
         )
         model_name = "auto-sm-model" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
         create_model_response = self._sm_client_.create_model(
@@ -106,6 +118,7 @@ class AutoModel():
         ''' '''
         # Package the model
         filename = self.package()
+        print(filename)
 
         # Push model.tar.gz to S3
         print(f"Uploading {filename} to S3...")
