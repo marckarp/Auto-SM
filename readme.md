@@ -38,16 +38,23 @@ Each framework has a different structure it needs to be saved in, reference the 
 
 #### SKLearn
 model.joblib
+
 inference.py
 
 #### PyTorch
 model.pth
+
 inference.py
 
 #### Tensorflow
 model_artifact_version/
+
     variables/
         variables.data
         variables.index
+
     keras_metadata.pb
+    
     saved_model.pb
+    
+inference.py
