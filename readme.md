@@ -37,16 +37,20 @@ The models you have trained need to be saved in a specific format required by Sa
 Each framework has a different structure it needs to be saved in, reference the guide below for how to provide your model artifacts and inference script for Sklearn, Tensorflow, and PyTorch. **Please make sure to adhere to the saved model formats displayed below to ensure successful deployment.**
 
 #### SKLearn
+```
 model.joblib
 
 inference.py
-
+```
 #### PyTorch
+```
 model.pth
 
 inference.py
+```
 
 #### Tensorflow
+```
 model_artifact_version/
 
     variables/
@@ -58,3 +62,4 @@ model_artifact_version/
     saved_model.pb
     
 inference.py
+```
