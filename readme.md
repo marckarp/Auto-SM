@@ -63,3 +63,23 @@ model_artifact_version/
     
 inference.py
 ```
+
+### Auto-SM Usage
+
+#### SKLearn Example
+```
+sklearn_model = SKLearnModel(version = '0.23-1', model_data = 'model.joblib', inference="inference.py")
+sklearn_model.deploy_to_sagemaker()
+```
+
+#### Tensorflow Example
+```
+tensorflow_model = TensorFlowModel(version = '2.3.0', model_data = '0000001', inference='inference.py') #000001 is the model data directory
+tensorflow_model.deploy_to_sagemaker()
+```
+
+#### PyTorch Example
+```
+pytorch_model = PyTorchModel(version = '1.8', model_data = 'model.pth', inference='inference.py')
+pytorch_model.deploy_to_sagemaker()
+```
