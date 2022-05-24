@@ -6,7 +6,7 @@ from .sm_client import AutoSMClient
 import boto3
 
 
-class AutoModel():
+class AutoSageMaker():
 
     """ """
     def __init__(self, **kwargs) -> None:

@@ -34,23 +34,52 @@ The models you have trained need to be saved in a specific format required by Sa
 * The trained model file
 * The code required to get predictions from the model
 
-Models must be saved in a folder with the following structure - 
-
-```
-model/
-    model.pkl|.pth|.joblib|.pt
-    code/ 
-        inference.py
-        requirements.txt
-        files_needed_by_inference.py
-```
+Each framework has a different structure it needs to be saved in, reference the guide below for how to provide your model artifacts and inference script for Sklearn, Tensorflow, and PyTorch. **Please make sure to adhere to the saved model formats displayed below to ensure successful deployment.**
 
 #### SKLearn
-...
+```
+model.joblib
 
+inference.py
+```
 #### PyTorch
-...
+```
+model.pth
+
+inference.py
+```
 
 #### Tensorflow
-...
+```
+model_artifact_version/
 
+    variables/
+        variables.data
+        variables.index
+
+    keras_metadata.pb
+    
+    saved_model.pb
+    
+inference.py
+```
+
+### Auto-SM Usage
+
+#### SKLearn Example
+```
+sklearn_model = SKLearnModel(version = '0.23-1', model_data = 'model.joblib', inference="inference.py")
+sklearn_model.deploy_to_sagemaker()
+```
+
+#### Tensorflow Example
+```
+tensorflow_model = TensorFlowModel(version = '2.3.0', model_data = '0000001', inference='inference.py') #000001 is the model data directory
+tensorflow_model.deploy_to_sagemaker()
+```
+
+#### PyTorch Example
+```
+pytorch_model = PyTorchModel(version = '1.8', model_data = 'model.pth', inference='inference.py')
+pytorch_model.deploy_to_sagemaker()
+```

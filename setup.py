@@ -3,7 +3,7 @@ import setuptools
 
 about = {}
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, "automodel", "__version__.py")) as f:
+with open(os.path.join(here, "autosagemaker", "__version__.py")) as f:
     exec(f.read(), about)
 
 
@@ -42,7 +42,7 @@ setuptools.setup(
     extras_require=extras,
     entry_points={
         "console_scripts": [
-            "automodel-configure=automodel.configure:main",
+            "autosagemaker-configure=autosagemaker.configure:main",
         ]
     },
     classifiers=[
