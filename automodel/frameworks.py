@@ -19,6 +19,7 @@ class SKLearnModel(AutoModel):
                 models.append(f)
         if len(models) == 0:
             raise ValueError("Sklearn model artifact must be of type model.joblib for SageMaker.")
+        print("Model files: ", models)
         return models
 
     def package(self):
@@ -43,6 +44,7 @@ class PyTorchModel(AutoModel):
                 models.append(f)
         if len(models) == 0:
             raise ValueError("PyTorch model artifact must be of type model.pt or model.pth for SageMaker.")
+        print("Model files: ", models)
         return models
 
     def package(self):
@@ -70,6 +72,7 @@ class TensorflowModel(AutoModel):
         
         if not len(models) == len(tf_files):
             raise ValueError("Tensorfflow model folder must container ['assets', 'variables', 'keras_metadata.pb', 'saved_model.pb'] for SageMaker.")
+        print("Model files: ", models)
         return models
 
     def package(self):
