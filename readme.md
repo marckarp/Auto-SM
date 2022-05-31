@@ -9,7 +9,7 @@ Deploying your pre-trained models on SageMaker allows you to benefit from scalab
 ### Installing the library
 1. Clone GitHub repo
 2. `python setup.py bdist_wheel`
-3. `pip install dist/automodel-0.0.1-py3-none-any.whl`
+3. `pip install dist/autosagemaker-0.0.1-py3-none-any.whl`
 
 ### Setup AWS credentials
 The functions in this library will create resources on Amazon SageMaker and require an IAM role that has policies which allow creating SageMaker Models, Endpoint Configurations, and Endpoints. It is best practice to create a role with the least priviledges needed. 

@@ -1,3 +1,3 @@
-from automodel.auto_model import AutoModel
-from automodel.sm_client import AutoSMClient
-from automodel.frameworks import *
+from autosagemaker.auto_sagemaker import AutoSageMaker
+from autosagemaker.sm_client import AutoSMClient
+from autosagemaker.frameworks import *

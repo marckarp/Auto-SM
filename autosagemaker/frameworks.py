@@ -1,6 +1,6 @@
 import os
 import subprocess
-from automodel.auto_model import AutoSageMaker
+from autosagemaker.auto_sagemaker import AutoSageMaker
 import sagemaker
 from time import gmtime, strftime
 import boto3
