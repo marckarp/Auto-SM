@@ -19,6 +19,7 @@ class AutoSageMaker():
         self._instance_type_ = kwargs.get('instance_type', 'ml.m5.xlarge')
         self._instance_count_ = kwargs.get('instance_count', 1)
         self._model_data_ = kwargs.get('model_data', None)
+        self._inference_option_ = kwargs.get('inference_option', 'real-time')
         self._requirements_ = kwargs.get('requirements', None)
         self._inference_ = kwargs.get('inference', None)
         
@@ -92,17 +93,36 @@ class AutoSageMaker():
     def create_endpoint_config(self, model_name):
         ''' '''
         endpoint_config = "auto-sm-endpoint-config-" + strftime("%Y-%m-%d-%H-%M-%S", gmtime())
-        endpoint_config_response = self._sm_client_.create_endpoint_config(
-            EndpointConfigName=endpoint_config,
-            ProductionVariants=[
-                {
-                    "VariantName": "sklearnvariant",
-                    "ModelName": model_name,
-                    "InstanceType": "ml.c5.large",
-                    "InitialInstanceCount": 1
-                },
-            ],
-        )
+        if self._inference_option_ == "real-time":
+            endpoint_config_response = self._sm_client_.create_endpoint_config(
+                EndpointConfigName=endpoint_config,
+                ProductionVariants=[
+                    {
+                        "VariantName": "sklearnvariant",
+                        "ModelName": model_name,
+                        "InstanceType": "ml.c5.large",
+                        "InitialInstanceCount": 1
+                    },
+                ],
+            )
+        elif self._inference_option_ == "serverless":
+            endpoint_config_response = self._sm_client_.create_endpoint_config(
+                EndpointConfigName=endpoint_config,
+                ProductionVariants=[
+                    {
+                        "VariantName": "sklearnvariant",
+                        "ModelName": model_name,
+                        "ServerlessConfig": {
+                            "MemorySizeInMB": 4096,
+                            "MaxConcurrency": 1,
+                        },
+                    },
+                ],
+            )
+
+        else:
+            raise ValueError("We only support serverless and real-time endpoints at the moment, enter one of these two options.")
+            
         return endpoint_config
 
     def create_endpoint(self, endpoint_config_name):
