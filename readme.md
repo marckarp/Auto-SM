@@ -19,7 +19,7 @@ For a quick start, you can use the Amazon managed SageMaker Exection Role -
 
 This library will look for the role in a file called `config.ini` stored in `$HOME`. You can create this file by running the following command - 
 
-`automodel-configure --module-name automodel.configure`
+`autosagemaker-configure --module-name autosagemaker.configure`
 
 This will prompt you to enter the role required for SageMaker. The file `config.ini` will look like - 
 
