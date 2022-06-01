@@ -15,7 +15,7 @@ class AutoSMClient():
         else:
             boto_session = boto3.session.Session(profile_name = profile_name)
         self._region_ = boto_session.region_name
-        sagemaker_session = sagemaker.Session()
+        sagemaker_session = sagemaker.Session(boto_session = boto_session)
         self._s3_client_ = boto_session.resource('s3')
         self._sm_client_ = boto3.client("sagemaker")
         
