@@ -1,9 +1,5 @@
 import os
-import subprocess
 from autosagemaker.auto_sagemaker import AutoSageMaker
-import sagemaker
-from time import gmtime, strftime
-import boto3
 
 
 class SKLearnModel(AutoSageMaker):
@@ -17,10 +13,6 @@ class SKLearnModel(AutoSageMaker):
     def _check_artifact_(self):
         ''' '''
         print("Model data contains: ", self._model_data_)
-        #files = os.listdir(self._model_data_)
-        print("Checking model artifact for sklearn------------------")
-        #print(files)
-        print("-------------------")
         if "joblib" not in self._model_data_:
             raise ValueError("Your sklearn model artifact needs to be in joblib format")
         return True
@@ -41,9 +33,6 @@ class TensorFlowModel(AutoSageMaker):
     def _check_artifact_(self):
         ''' '''
         print("Model data contains: ", self._model_data_)
-        print("Checking model artifact for tensorflow------------------")
-        print("-------------------")
-
         tf_files = ['variables', 'keras_metadata.pb', 'saved_model.pb']
         if os.path.isdir(self._model_data_):
             files = os.listdir(self._model_data_)
@@ -69,10 +58,6 @@ class PyTorchModel(AutoSageMaker):
     def _check_artifact_(self):
         ''' '''
         print("Model data contains: ", self._model_data_)
-        #files = os.listdir(self._model_data_)
-        print("Checking model artifact for sklearn------------------")
-        #print(files)
-        print("-------------------")
         if "pth" not in self._model_data_:
             raise ValueError("Your pytorch model artifact needs to be in .pth format")
         return True
@@ -84,32 +69,3 @@ class PyTorchModel(AutoSageMaker):
 
 if __name__ == "__main__":
     ''' '''
-
-    #To-do: Need to find a way to package when there is no inference script
-
-
-    #Edge Case 1: Sklearn with inference script (working)
-    #To-do: Kirit try with a different sklearn model + inference script
-    #sklearn_model = SKLearnModel(version = '0.23-1', model_data = 'model.joblib', inference="inference.py")
-    #sklearn_model.deploy_to_sagemaker()
-
-
-    #Edge Case 2: Sklearn without inference script (broken/bug)
-
-
-    #Edge Case 3: TF with inference script (working)
-    ##To-do: Kirit try with a different TF model + inference script
-    #tensorflow_model = TensorFlowModel(version = '2.3.0', model_data = '0000001', inference='inference.py')
-    #tensorflow_model.deploy_to_sagemaker()
-
-
-    #Edge Case 4: TF without inference script (this works too, just didn't test here)
-
-
-    #Edge Case 5: PT with inference script (working)
-    #To-do: Ram try with a PT model + inference script
-    pytorch_model = PyTorchModel(version = '1.8', model_data = 'model.pth', inference='inference.py')
-    pytorch_model.deploy_to_sagemaker()
-
-
-    #Edge Case 6 PT without inference script

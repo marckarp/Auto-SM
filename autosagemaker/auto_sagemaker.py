@@ -3,8 +3,6 @@ import subprocess
 import sagemaker
 from time import gmtime, strftime
 from .sm_client import AutoSMClient
-import boto3
-
 
 class AutoSageMaker():
 
@@ -98,7 +96,7 @@ class AutoSageMaker():
                 EndpointConfigName=endpoint_config,
                 ProductionVariants=[
                     {
-                        "VariantName": "sklearnvariant",
+                        "VariantName": "primaryvariant",
                         "ModelName": model_name,
                         "InstanceType": "ml.c5.large",
                         "InitialInstanceCount": 1
@@ -110,7 +108,7 @@ class AutoSageMaker():
                 EndpointConfigName=endpoint_config,
                 ProductionVariants=[
                     {
-                        "VariantName": "sklearnvariant",
+                        "VariantName": "primaryvariant",
                         "ModelName": model_name,
                         "ServerlessConfig": {
                             "MemorySizeInMB": 4096,

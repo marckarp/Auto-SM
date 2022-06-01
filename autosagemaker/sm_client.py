@@ -9,7 +9,8 @@ class AutoSMClient():
     """ """
     def __init__(self, **kwargs) -> None:
         ''' '''
-        boto_session = boto3.session.Session()
+        profile_name = kwargs.get('profile_name', 'default')
+        boto_session = boto3.session.Session(profile_name = profile_name)
         self._region_ = boto_session.region_name
         sagemaker_session = sagemaker.Session()
         self._s3_client_ = boto_session.resource('s3')
