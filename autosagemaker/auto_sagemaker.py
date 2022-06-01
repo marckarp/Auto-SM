@@ -16,6 +16,10 @@ class AutoSageMaker():
 
         self._instance_type_ = kwargs.get('instance_type', 'ml.m5.xlarge')
         self._instance_count_ = kwargs.get('instance_count', 1)
+
+        self._memory_size_ = kwargs.get('memory_size', 4096)
+        self._concurrency_ = kwargs.get('concurrency', 10)
+
         self._model_data_ = kwargs.get('model_data', None)
         self._inference_option_ = kwargs.get('inference_option', 'real-time')
         self._requirements_ = kwargs.get('requirements', None)
@@ -28,8 +32,6 @@ class AutoSageMaker():
             assert self._inference_.split('/')[-1] == 'inference.py', "Inference script must be named inference.py"
     
         if not (self._model_data_ is None):
-            #need to add logic to distinguish sklearn, tf, pytorch here
-            #sklearn is just a file and script, tf is a folder
             assert not (len(self._model_data_) == 0), "Make sure to provide a model file"
 
         self._sm_client_ = self._auto_sm_client_.AutoSagemakerClient
@@ -40,8 +42,6 @@ class AutoSageMaker():
         ''' '''
         filename = 'model.tar.gz'
         try:
-            #print(os.listdir(self._model_data_))
-            print("-----In packaging function-----------")
             print(self._model_data_)
             print(self._inference_)
             zip_file = f"tar -cvpzf model.tar.gz {self._model_data_} {self._inference_}"
@@ -55,7 +55,6 @@ class AutoSageMaker():
         ''' '''
         s3_client = self._auto_sm_client_.AutoS3Client
         default_bucket = self._auto_sm_client_.DefaultBucket
-        #default_bucket = sagemaker_session.default_bucket()
         model_artifacts = f"s3://{default_bucket}/model.tar.gz"
         response = s3_client.upload_file(filename, default_bucket, 'model.tar.gz')
         return model_artifacts
@@ -98,8 +97,8 @@ class AutoSageMaker():
                     {
                         "VariantName": "primaryvariant",
                         "ModelName": model_name,
-                        "InstanceType": "ml.c5.large",
-                        "InitialInstanceCount": 1
+                        "InstanceType": self._instance_type_,
+                        "InitialInstanceCount": self._instance_count_
                     },
                 ],
             )
@@ -111,8 +110,8 @@ class AutoSageMaker():
                         "VariantName": "primaryvariant",
                         "ModelName": model_name,
                         "ServerlessConfig": {
-                            "MemorySizeInMB": 4096,
-                            "MaxConcurrency": 1,
+                            "MemorySizeInMB": self._memory_size_,
+                            "MaxConcurrency": self._concurrency_,
                         },
                     },
                 ],

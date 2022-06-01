@@ -8,6 +8,10 @@ class SKLearnModel(AutoSageMaker):
         kwargs['framework'] = 'sklearn'
         assert 'version' in kwargs, "Framework version must be specified."
         assert 'model_data' in kwargs, "Folder with model data must be provided"
+        
+        ## Retrieve list of versions from SM
+        ## Check if version in list of versions
+
         super().__init__(**kwargs)
 
     def _check_artifact_(self):
@@ -28,6 +32,10 @@ class TensorFlowModel(AutoSageMaker):
         kwargs['framework'] = 'tensorflow'
         assert 'version' in kwargs, "Framework version must be specified."
         assert 'model_data' in kwargs, "Folder with model data must be provided"
+        
+        ## Retrieve list of versions from SM
+        ## Check if version in list of versions
+
         super().__init__(**kwargs)
 
     def _check_artifact_(self):
@@ -53,6 +61,10 @@ class PyTorchModel(AutoSageMaker):
         kwargs['framework'] = 'pytorch'
         assert 'version' in kwargs, "Framework version must be specified."
         assert 'model_data' in kwargs, "Folder with model data must be provided"
+        
+        ## Retrieve list of versions from SM
+        ## Check if version in list of versions
+
         super().__init__(**kwargs)
 
     def _check_artifact_(self):
