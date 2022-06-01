@@ -55,7 +55,7 @@ class AutoSageMaker():
         ''' '''
         s3_client = self._auto_sm_client_.AutoS3Client
         default_bucket = self._auto_sm_client_.DefaultBucket
-        prefix = 'autosagemaker/{strftime("%Y-%m-%d-%H-%M-%S", gmtime())}'
+        prefix = f'autosagemaker/{strftime("%Y-%m-%d-%H-%M-%S", gmtime())}'
         model_artifacts = f"s3://{default_bucket}/{prefix}/model.tar.gz"
         response = s3_client.upload_file(filename, default_bucket, '{prefix}/model.tar.gz')
         return model_artifacts
